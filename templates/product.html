@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class='mb-2'>{{ product.product_name }}</h1>
+
+    <p class='card-text'>{{ product.description }}</p>
+
+    <div class='mb-4'>{{ product.price }}$</div>
+
+    <a class='btn btn-info' href='/edit-product/{{ product.product_id}}'>Edit</a>
+
+    <a class='btn btn-danger' href='/product/{{ product.product_id}}/delete'>Delete</a>
+
+{% endblock content %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Products</h1>
+
+<div class="d-flex flex-wrap gap-4">
+    {% for product in products %}
+    <div class="card" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ product.product_name }}</h5>
+
+        <p class="card-text">{{ product.description }}</p>
+
+        <div class="mb-4">{{ product.price }}$</div>
+
+        <a class="btn btn-info" href="/product/{{ product.product_id}}">Details</a>
+      </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}
