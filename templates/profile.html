@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="profile-section mb-5">
+        <h2>Personal Information</h2>
+        <p>First Name: {{ user.first_name }}</p>
+        <p>Last Name: {{ user.last_name }}</p>
+        <p>Email: {{ user.email }}</p>
+    </div>
+
+    <div class="profile-section mb-5">
+        <h2>Change Password</h2>
+
+        <form method="POST" action="{{ url_for('change_password') }}">
+            <div class="form-group mb-3">
+                <label for="old_password">Old Password</label>
+                <input type="password" class="form-control" id="old_password" name="old_password">
+            </div>
+            <div class="form-group mb-3">
+                <label for="new_password">New Password</label>
+                <input type="password" class="form-control" id="new_password" name="new_password">
+            </div>
+            <button type="submit" class="btn btn-primary">Change Password</button>
+        </form>
+    </div>
+
+    {% if user.role == 'client' %}
+        <div class="profile-section mb-5">
+            <h2>Order History</h2>
+
+            <ul>
+                {% for order in user.orders %}
+                    <li>Order #{{ order.id }} - {{ order.status }} - ${{ order.total_price }}</li>
+                {% endfor %}
+            </ul>
+
+            {% if not user.orders %}
+                <div>
+                    You haven't bought anything yet.
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+     {% if user.role == 'client' %}
+        <div class="profile-section mb-5">
+            <h2>Favorite Products</h2>
+
+            <div>
+                {% for product in favorite_products %}
+                    <div class="d-flex">
+                        <div class="me-3">{{ product.product_name }} - ${{ product.price }}</div>
+
+                        <form method="POST" action='/remove-from-favorites/{{ product.product_id}}'>
+                            <button type="submit" class="btn-close"></button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if not favorite_products %}
+                <div>
+                   You don't have any products in your favorites.
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock content %}

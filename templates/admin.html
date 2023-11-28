@@ -1,10 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block content %}
+
+    <h1 class="mb-4">Create admin</h1>
+
+    <form method="POST" action="/create-admin">
+        <input
+                class="form-control mb-3"
+                type="email"
+                name="email"
+                placeholder="Enter new user email"
+        >
+
+        <input
+                class="form-control mb-3"
+                type="password"
+                name="password"
+                placeholder="Enter user password"
+        >
+
+        <input
+                class="form-control mb-3"
+                type="password"
+                name="password"
+                placeholder="Repeat user password"
+        >
+
+        <input
+                class="btn btn-success"
+                type="submit"
+                value="Create admin"
+        >
+    </form>
+
+{% endblock content %}

@@ -7,8 +7,15 @@
 
     <div class='mb-4'>{{ product.price }}$</div>
 
-    <a class='btn btn-info' href='/edit-product/{{ product.product_id}}'>Edit</a>
+    {% if user.role == 'admin' %}
+        <a class='btn btn-info' href='/edit-product/{{ product.product_id}}'>Edit</a>
+        <a class='btn btn-danger' href='/product/{{ product.product_id}}/delete'>Delete</a>
+    {% endif %}
 
-    <a class='btn btn-danger' href='/product/{{ product.product_id}}/delete'>Delete</a>
+    {% if user.role == 'client' %}
+        <form method="POST" action='/add-to-cart/{{ product.product_id}}'>
+            <button type="submit" class="btn btn-primary">Add to Cart</button>
+        </form>
+    {% endif %}
 
 {% endblock content %}

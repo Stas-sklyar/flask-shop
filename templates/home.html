@@ -13,7 +13,19 @@
 
         <div class="mb-4">{{ product.price }}$</div>
 
-        <a class="btn btn-info" href="/product/{{ product.product_id}}">Details</a>
+        <a class="btn btn-info w-100 mb-2" href="/product/{{ product.product_id}}">Details</a>
+
+           {% if not user.role == 'admin' %}
+              <form class='w-100 mb-2' method="POST" action='/add-to-cart/{{ product.product_id}}'>
+                <button type="submit" class="btn btn-primary w-100">Add to Cart</button>
+              </form>
+          {% endif %}
+
+          {% if not user.role == 'admin' %}
+              <form class='w-100' method="POST" action='/add-to-favorites/{{ product.product_id}}'>
+                <button type="submit" class="btn btn-success w-100">Add to Favorites</button>
+              </form>
+          {% endif %}
       </div>
     </div>
     {% endfor %}

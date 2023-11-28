@@ -14,9 +14,10 @@
               <a class="navbar-brand" href="/">Home</a>
 
               <div>
-                  <a class="btn btn-success" href="/login">Login</a>
-                    <a class="btn btn-success" href="/login">Registration</a>
-                  <a class="btn btn-warning" href="/create-product">Create product</a>
+                  <a class="btn btn-success" href="{{ url_for('logout') if logged_in else url_for('login') }}">{{ 'Logout' if logged_in else 'Login' }}</a>
+                  {% if not logged_in %} <a class="btn btn-success" href="/registration">Registration</a> {% endif %}
+                  {% if logged_in %} <a class="btn btn-warning" href="/my-profile">My Profile</a> {% endif %}
+                  {% if user.role == 'admin' %} <a class="btn btn-warning" href="/admin">Admin</a> {% endif %}
               </div>
           </div>
         </nav>
