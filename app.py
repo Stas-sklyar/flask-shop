@@ -5,6 +5,8 @@ from datetime import datetime
 from flask_bcrypt import Bcrypt
 from decorators import login_required
 from functools import wraps
+import json
+from sqlalchemy import func
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -25,6 +27,17 @@ def inject_logged_in():
     return dict(logged_in=logged_in, user=user)
 
 
+class AppUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.VARCHAR(50), nullable=False, unique=True)
+    password = db.Column(db.VARCHAR(100), nullable=False)
+    role = db.Column(db.VARCHAR(100), nullable=False)
+    favorite_products = db.relationship('Product', secondary='user_favorite_products')
+
+    def __repr__(self):
+        return f'Product(id={self.id}, email={self.email}, password={self.password}, role={self.role})'
+
+
 class Product(db.Model):
     product_id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String(50), nullable=False)
@@ -36,15 +49,21 @@ class Product(db.Model):
         return f'Product(product_id={self.product_id}, product_name={self.product_name}, description={self.description}, price={self.price}, date={self.date})'
 
 
-class AppUser(db.Model):
+class AppOrder(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.VARCHAR(50), nullable=False, unique=True)
-    password = db.Column(db.VARCHAR(100), nullable=False)
-    role = db.Column(db.VARCHAR(100), nullable=False)
-    favorite_products = db.relationship('Product', secondary='user_favorite_products')
+    order_date = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(50))
+    user_id = db.Column(db.Integer, db.ForeignKey('app_user.id'))
+    total_amount = db.Column(db.Float)
+    delivery_address = db.Column(db.String(255))
 
     def __repr__(self):
-        return f'Product(id={self.id}, email={self.email}, password={self.password}, role={self.role})'
+        return f"<Order {self.id}>"
+
+
+class AppOrderProduct(db.Model):
+    order_id = db.Column(db.Integer, db.ForeignKey('app_order.id'), primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'), primary_key=True)
 
 
 user_favorite_products = db.Table(
@@ -81,23 +100,22 @@ def admin():
     return render_template('admin.html')
 
 
-@app.route('/create-product', methods=['POST', 'GET'])
+@app.route('/create-product', methods=['POST'])
+@admin_required
 def create_product():
-    if request.method == 'POST':
-        product_name = request.form['product_name']
-        description = request.form['description']
-        price = request.form['price']
+    product_name = request.form['product_name']
+    description = request.form['description']
+    price = request.form['price']
 
-        new_product = Product(product_name=product_name, description=description, price=price)
+    new_product = Product(product_name=product_name, description=description, price=price)
 
-        db.session.add(new_product)
-        db.session.commit()
-        return redirect('/product')
-    else:
-        return render_template('create-product.html')
+    db.session.add(new_product)
+    db.session.commit()
+    return redirect(f"/product/{new_product.product_id}")
 
 
 @app.route('/edit-product/<int:product_id>')
+@admin_required
 def edit_product(product_id):
     return render_template('edit-product.html', product_id=product_id)
 
@@ -105,10 +123,22 @@ def edit_product(product_id):
 @app.route('/product/<int:product_id>')
 def product_detail(product_id):
     product = Product.query.get(product_id)
-    return render_template('product.html', product=product)
 
+    purchase_counts = db.session.query(
+        AppUser.id,
+        func.count(AppOrderProduct.order_id)
+    ).join(
+        AppOrder, AppOrder.id == AppOrderProduct.order_id
+    ).filter(
+        AppOrderProduct.product_id == product_id
+    ).group_by(
+        AppUser.id
+    ).all()
+
+    return render_template('product.html', product=product, purchase_counts=purchase_counts)
 
 @app.route('/product/<int:product_id>/delete')
+@admin_required
 def delete_product(product_id):
     product = Product.query.get_or_404(product_id)
 
@@ -251,6 +281,7 @@ def decrement_cart(product_id):
 
 
 @app.route('/remove-from-cart/<int:product_id>', methods=['POST'])
+@login_required
 def remove_from_cart(product_id):
     if 'cart' in session:
         product_id = str(product_id)
@@ -302,6 +333,7 @@ def remove_from_favorites(product_id):
 
 
 @app.route('/checkout')
+@login_required
 def checkout():
     cart_contents = session.get('cart', {})
     total_price = 0
@@ -315,15 +347,47 @@ def checkout():
 
 
 @app.route('/confirm-order', methods=['GET', 'POST'])
+@login_required
 def confirm_order():
     if request.method == 'POST':
+        cart_contents = session.get('cart', {})
+        total_price = 0
+        user_id = session['user_id']
+
+        for product_id, quantity in cart_contents.items():
+            product = Product.query.get(int(product_id))
+            if product:
+                total_price += product.price * quantity
+
+
+        new_app_order = AppOrder(
+            status='in_progress',
+            user_id=user_id,
+            total_amount=total_price,
+            delivery_address='Address...',
+        )
+        db.session.add(new_app_order)
+        db.session.commit()
+
+        for product_id, _ in cart_contents.items():
+            product = Product.query.get(int(product_id))
+
+            new_app_order_product = AppOrderProduct(
+                order_id=new_app_order.id,
+                product_id=product.product_id
+            )
+            db.session.add(new_app_order_product)
+
+        db.session.commit()
+
         if 'cart' in session:
             session.pop('cart')
-
-        return redirect('order-successfully-confirmed')
+        return render_template('order-successfully-confirmed.html')
     else:
         return render_template('confirm-order.html')
 
+
 @app.route('/order-successfully-confirmed')
+@login_required
 def order_successfully_confirmed():
     return render_template('order-successfully-confirmed.html')

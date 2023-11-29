@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>Products</h1>
+<h1 class="my-4">Products</h1>
 
 <div class="d-flex flex-wrap gap-4">
     {% for product in products %}
@@ -11,7 +15,7 @@
 
         <p class="card-text">{{ product.description }}</p>
 
-        <div class="mb-4">{{ product.price }}$</div>
+        <div class="card-price mb-4">{{ product.price }}$</div>
 
         <a class="btn btn-info w-100 mb-2" href="/product/{{ product.product_id}}">Details</a>
 

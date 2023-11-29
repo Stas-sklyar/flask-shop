@@ -1,21 +1,37 @@
 {% extends 'base.html' %}
 
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/product.css') }}">
+{% endblock %}
+
 {% block content %}
-    <h1 class='mb-2'>{{ product.product_name }}</h1>
+    <section class="section product-details my-4 w-100">
+        <h1 class='mb-2 product-title'>{{ product.product_name }}</h1>
 
-    <p class='card-text'>{{ product.description }}</p>
+        <p class='card-text product-description'>{{ product.description }}</p>
 
-    <div class='mb-4'>{{ product.price }}$</div>
+        <div class='mb-4 product-price'>{{ product.price }}$</div>
 
-    {% if user.role == 'admin' %}
-        <a class='btn btn-info' href='/edit-product/{{ product.product_id}}'>Edit</a>
-        <a class='btn btn-danger' href='/product/{{ product.product_id}}/delete'>Delete</a>
-    {% endif %}
+        {% if user.role == 'admin' %}
+            <div class="admin-actions">
+                <a class='btn btn-info edit-btn' href='/edit-product/{{ product.product_id}}'>Edit</a>
+                <a class='btn btn-danger delete-btn' href='/product/{{ product.product_id}}/delete'>Delete</a>
+            </div>
+        {% endif %}
 
-    {% if user.role == 'client' %}
-        <form method="POST" action='/add-to-cart/{{ product.product_id}}'>
-            <button type="submit" class="btn btn-primary">Add to Cart</button>
-        </form>
-    {% endif %}
+        {% if user.role == 'client' %}
+            <form class="add-to-cart-form" method="POST" action='/add-to-cart/{{ product.product_id}}'>
+                <button type="submit" class="btn btn-primary add-to-cart-btn">Add to Cart</button>
+            </form>
+        {% endif %}
 
+        {% if user.role == 'admin' %}
+            <ul>
+              {% for user_id, purchase_count in purchase_counts %}
+                <li>{{ user_id }} bought this product {{ purchase_count }} times.</li>
+              {% endfor %}
+            </ul>
+        {% endif %}
+
+    </section>
 {% endblock content %}

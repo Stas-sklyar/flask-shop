@@ -1,36 +1,76 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <div class="my-4">
+        <section class="section">
+        <h1 class="mb-3">Create admin</h1>
 
-    <h1 class="mb-4">Create admin</h1>
-
-    <form method="POST" action="/create-admin">
-        <input
-                class="form-control mb-3"
-                type="email"
-                name="email"
-                placeholder="Enter new user email"
+        <form
+                class="mb-4"
+                method="POST"
+                action="/create-admin"
         >
+            <input
+                    class="form-control mb-3"
+                    type="email"
+                    name="email"
+                    placeholder="Enter new user email"
+            >
 
-        <input
-                class="form-control mb-3"
-                type="password"
-                name="password"
-                placeholder="Enter user password"
-        >
+            <input
+                    class="form-control mb-3"
+                    type="password"
+                    name="password"
+                    placeholder="Enter user password"
+            >
 
-        <input
-                class="form-control mb-3"
-                type="password"
-                name="password"
-                placeholder="Repeat user password"
-        >
+            <input
+                    class="form-control mb-3"
+                    type="password"
+                    name="password"
+                    placeholder="Repeat user password"
+            >
 
-        <input
-                class="btn btn-success"
-                type="submit"
-                value="Create admin"
-        >
-    </form>
+            <input
+                    class="btn btn-success"
+                    type="submit"
+                    value="Create admin"
+            >
+        </form>
+    </section>
+        <hr>
+        <section class="section">
+        <h1 class="mb-3">Create Product</h1>
 
+        <form method="post" action="/create-product">
+            <input
+                    class="form-control mb-3"
+                    type="text"
+                    name="product_name"
+                    placeholder="Enter product name"
+                    required
+            >
+            <textarea
+                    class="form-control mb-3"
+                    name="description"
+                    placeholder="Enter product description"
+                    required
+            ></textarea>
+
+            <input
+                    class="form-control mb-3"
+                    type="number"
+                    name="price"
+                    placeholder="Enter price"
+                    required
+            >
+
+            <input
+                    class="btn btn-success"
+                    type="submit"
+                    value="Create Product"
+            >
+        </form>
+    </section>
+    </div>
 {% endblock content %}

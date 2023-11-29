@@ -1,0 +1,51 @@
+* {
+    transition: all .3s ease !important;
+}
+
+body {
+    color: #333333;
+}
+
+.btn {
+    border-radius: 6px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    margin-bottom: 3px;
+}
+
+h1 {
+    font-size: 32px;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+.section {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+    background-color: #fff;
+}
+
+.section:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}

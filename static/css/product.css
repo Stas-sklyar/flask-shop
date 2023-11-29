@@ -1,0 +1,22 @@
+
+.product-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.product-description {
+    color: #555;
+    line-height: 1.5;
+}
+
+.product-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.add-to-cart-form {
+    display: inline-block;
+    margin-top: 15px;
+}
